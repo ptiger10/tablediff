@@ -31,7 +31,6 @@ type Differences struct {
 }
 
 // diff returns the Differences in table2 relative to table1.
-// If there are no differences, returns nil
 func diff(table1 [][]string, table2 [][]string) *Differences {
 	// check for nil table
 	var nCols1, nCols2 int
@@ -65,4 +64,11 @@ func diff(table1 [][]string, table2 [][]string) *Differences {
 		Modifications: mods,
 	}
 	return ret
+}
+
+// Diff returns the Differences between two tables. If there are no differences, ok returns true.
+func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, ok bool) {
+	diffs = diff(table1, table2)
+	ok = equal(table1, table2)
+	return
 }
