@@ -75,6 +75,11 @@ func Test_diff(t *testing.T) {
 			[][]string{}},
 			&Differences{0, 0, nil},
 		},
+		{"1 more row", args{
+			[][]string{{"foo"}},
+			[][]string{{"foo"}, {"baz"}}},
+			&Differences{-1, 0, nil},
+		},
 		{"1 fewer row", args{
 			[][]string{{"foo"}, {"baz"}},
 			[][]string{{"foo"}}},
@@ -85,15 +90,15 @@ func Test_diff(t *testing.T) {
 			[][]string{{"foo", "bar"}, {"baz", "qux"}}},
 			&Differences{0, 1, nil},
 		},
+		{"1 fewer column", args{
+			[][]string{{"foo", "bar"}, {"baz", "qux"}},
+			[][]string{{"foo"}, {"baz"}}},
+			&Differences{0, -1, nil},
+		},
 		{"different values", args{
 			[][]string{{"foo", "bar"}},
 			[][]string{{"foo", "baz"}}},
 			&Differences{0, 0, []string{"[0,1]: bar -> baz"}},
-		},
-		{"different values - fewer rows", args{
-			[][]string{{"foo", "bar"}, {"qux", "quux"}},
-			[][]string{{"foo", "baz"}}},
-			&Differences{-1, 0, []string{"[0,1]: bar -> baz"}},
 		},
 	}
 	for _, tt := range tests {

@@ -48,7 +48,7 @@ func diff(table1 [][]string, table2 [][]string) *Differences {
 			continue
 		} else {
 			for j := 0; j < nCols1; j++ {
-				if nCols2 <= i {
+				if nCols2 <= j {
 					continue
 				} else {
 					if table1[i][j] != table2[i][j] {
