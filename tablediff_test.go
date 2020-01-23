@@ -66,45 +66,50 @@ func Test_diff(t *testing.T) {
 		want *Differences
 	}{
 		{"no differences", args{
-			[][]string{{"foo", "bar", "baz"}, {"qux", "quz", "quuz"}},
-			[][]string{{"foo", "bar", "baz"}, {"qux", "quz", "quuz"}}},
-			&Differences{0, 0, nil},
+			[][]string{{"foo"}, {"bar"}},
+			[][]string{{"foo"}, {"bar"}}},
+			&Differences{0, 0, [][]string{{""}, {""}}},
 		},
 		{"no differences - both empty", args{
 			[][]string{},
 			[][]string{}},
-			&Differences{0, 0, nil},
+			&Differences{0, 0, [][]string{}},
 		},
 		{"1 more row", args{
 			[][]string{{"foo"}},
 			[][]string{{"foo"}, {"baz"}}},
-			&Differences{-1, 0, nil},
+			&Differences{1, 0, [][]string{{""}, {"'' -> baz"}}},
 		},
 		{"1 fewer row", args{
 			[][]string{{"foo"}, {"baz"}},
 			[][]string{{"foo"}}},
-			&Differences{-1, 0, nil},
+			&Differences{-1, 0, [][]string{{""}, {"baz -> ''"}}},
 		},
 		{"1 more column", args{
-			[][]string{{"foo"}, {"baz"}},
-			[][]string{{"foo", "bar"}, {"baz", "qux"}}},
-			&Differences{0, 1, nil},
+			[][]string{{"foo"}},
+			[][]string{{"foo", "bar"}}},
+			&Differences{0, 1, [][]string{{"", "'' -> bar"}}},
 		},
 		{"1 fewer column", args{
-			[][]string{{"foo", "bar"}, {"baz", "qux"}},
-			[][]string{{"foo"}, {"baz"}}},
-			&Differences{0, -1, nil},
+			[][]string{{"foo", "bar"}},
+			[][]string{{"foo"}}},
+			&Differences{0, -1, [][]string{{"", "bar -> ''"}}},
 		},
 		{"different values", args{
 			[][]string{{"foo", "bar"}},
 			[][]string{{"foo", "baz"}}},
-			&Differences{0, 0, []string{"[0,1]: bar -> baz"}},
+			&Differences{0, 0, [][]string{{"", "bar -> baz"}}},
+		},
+		{"different shapes", args{
+			[][]string{{"foo", "bar"}},
+			[][]string{{"foo"}, {"baz"}}},
+			&Differences{1, -1, [][]string{{"", "bar -> ''"}, {"'' -> baz", "n/a"}}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := diff(tt.args.table1, tt.args.table2); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("diff() = %v, want %v", got, tt.want)
+				t.Errorf("diff() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}

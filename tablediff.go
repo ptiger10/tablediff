@@ -27,7 +27,7 @@ func equal(table1 [][]string, table2 [][]string) bool {
 type Differences struct {
 	ExtraRows     int
 	ExtraColumns  int
-	Modifications []string
+	Modifications [][]string
 }
 
 // diff returns the Differences in table2 relative to table1.
@@ -42,20 +42,33 @@ func diff(table1 [][]string, table2 [][]string) *Differences {
 	}
 	extraRows := len(table2) - len(table1)
 	extraColumns := nCols2 - nCols1
-	var mods []string
-	for i := 0; i < len(table1); i++ {
-		if len(table2) <= i {
-			continue
-		} else {
-			for j := 0; j < nCols1; j++ {
-				if nCols2 <= j {
-					continue
-				} else {
-					if table1[i][j] != table2[i][j] {
-						mods = append(mods, fmt.Sprintf("[%v,%v]: %v -> %v", i, j, table1[i][j], table2[i][j]))
-					}
+	maxRows := len(table1)
+	if len(table2) > len(table1) {
+		maxRows = len(table2)
+	}
+	maxCols := nCols1
+	if nCols2 > nCols1 {
+		maxCols = nCols2
+	}
+	mods := make([][]string, maxRows)
+	for i := 0; i < maxRows; i++ {
+		mods[i] = make([]string, maxCols)
+		for j := 0; j < maxCols; j++ {
+			var val string
+			notInTable1 := len(table1) <= i || nCols1 <= j
+			notInTable2 := len(table2) <= i || nCols2 <= j
+			if notInTable1 && notInTable2 {
+				val = "n/a"
+			} else if notInTable1 {
+				val = fmt.Sprintf("'' -> %v", table2[i][j])
+			} else if notInTable2 {
+				val = fmt.Sprintf("%v -> ''", table1[i][j])
+			} else {
+				if table1[i][j] != table2[i][j] {
+					val = fmt.Sprintf("%v -> %v", table1[i][j], table2[i][j])
 				}
 			}
+			mods[i][j] = val
 		}
 	}
 	ret := &Differences{
