@@ -2,27 +2,6 @@ package tablediff
 
 import "fmt"
 
-// equal evaluates whether two tables are identical
-func equal(table1 [][]string, table2 [][]string) bool {
-	if len(table1) == 0 && len(table2) == 0 {
-		return true
-	}
-	if len(table1) != len(table2) {
-		return false
-	}
-	if len(table1[0]) != len(table2[0]) {
-		return false
-	}
-	for i := 0; i < len(table1); i++ {
-		for j := 0; j < len(table1[0]); j++ {
-			if table1[i][j] != table2[i][j] {
-				return false
-			}
-		}
-	}
-	return true
-}
-
 // Differences contains the differences between two tables
 type Differences struct {
 	ExtraRows     int
@@ -30,8 +9,9 @@ type Differences struct {
 	Modifications [][]string
 }
 
-// diff returns the Differences in table2 relative to table1.
-func diff(table1 [][]string, table2 [][]string) *Differences {
+// Diff returns the Differences in table2 relative to table1 and whether the two tables are equal.
+func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool) {
+	equal = true
 	// check for nil table
 	var nCols1, nCols2 int
 	if len(table1) != 0 {
@@ -59,13 +39,17 @@ func diff(table1 [][]string, table2 [][]string) *Differences {
 			notInTable2 := len(table2) <= i || nCols2 <= j
 			if notInTable1 && notInTable2 {
 				val = "n/a"
+				equal = false
 			} else if notInTable1 {
 				val = fmt.Sprintf("'' -> %v", table2[i][j])
+				equal = false
 			} else if notInTable2 {
 				val = fmt.Sprintf("%v -> ''", table1[i][j])
+				equal = false
 			} else {
 				if table1[i][j] != table2[i][j] {
 					val = fmt.Sprintf("%v -> %v", table1[i][j], table2[i][j])
+					equal = false
 				}
 			}
 			mods[i][j] = val
@@ -76,12 +60,5 @@ func diff(table1 [][]string, table2 [][]string) *Differences {
 		ExtraColumns:  extraColumns,
 		Modifications: mods,
 	}
-	return ret
-}
-
-// Diff returns the Differences between two tables. If there are no differences, ok returns true.
-func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, ok bool) {
-	diffs = diff(table1, table2)
-	ok = equal(table1, table2)
-	return
+	return ret, equal
 }
