@@ -41,14 +41,14 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 				val = "n/a"
 				equal = false
 			} else if notInTable1 {
-				val = fmt.Sprintf("'' -> %v", table2[i][j])
+				val = fmt.Sprintf("''->%v", table2[i][j])
 				equal = false
 			} else if notInTable2 {
-				val = fmt.Sprintf("%v -> ''", table1[i][j])
+				val = fmt.Sprintf("%v->''", table1[i][j])
 				equal = false
 			} else {
 				if table1[i][j] != table2[i][j] {
-					val = fmt.Sprintf("%v -> %v", table1[i][j], table2[i][j])
+					val = fmt.Sprintf("%v->%v", table1[i][j], table2[i][j])
 					equal = false
 				}
 			}
