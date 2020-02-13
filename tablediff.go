@@ -31,10 +31,13 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 	}
 	extraRows := len(table2) - len(table1)
 	extraColumns := nCols2 - nCols1
+
+	// determine max rows
 	maxRows := len(table1)
 	if len(table2) > len(table1) {
 		maxRows = len(table2)
 	}
+	// determine max columns
 	maxCols := nCols1
 	if nCols2 > nCols1 {
 		maxCols = nCols2
@@ -42,26 +45,26 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 	mods := make([][]string, maxRows)
 	for i := 0; i < maxRows; i++ {
 		mods[i] = make([]string, maxCols)
-		for j := 0; j < maxCols; j++ {
+		for k := 0; k < maxCols; k++ {
 			var val string
-			notInTable1 := len(table1) <= i || nCols1 <= j
-			notInTable2 := len(table2) <= i || nCols2 <= j
+			notInTable1 := len(table1) <= i || nCols1 <= k
+			notInTable2 := len(table2) <= i || nCols2 <= k
 			if notInTable1 && notInTable2 {
 				val = "n/a"
 				equal = false
 			} else if notInTable1 {
-				val = fmt.Sprintf("''->%v", table2[i][j])
+				val = fmt.Sprintf("''->%v", table2[i][k])
 				equal = false
 			} else if notInTable2 {
-				val = fmt.Sprintf("%v->''", table1[i][j])
+				val = fmt.Sprintf("%v->''", table1[i][k])
 				equal = false
 			} else {
-				if table1[i][j] != table2[i][j] {
-					val = fmt.Sprintf("%v->%v", table1[i][j], table2[i][j])
+				if table1[i][k] != table2[i][k] {
+					val = fmt.Sprintf("%v->%v", table1[i][k], table2[i][k])
 					equal = false
 				}
 			}
-			mods[i][j] = val
+			mods[i][k] = val
 		}
 	}
 	ret := &Differences{
