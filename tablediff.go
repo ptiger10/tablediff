@@ -1,12 +1,21 @@
 package tablediff
 
-import "fmt"
+import (
+	"encoding/csv"
+	"fmt"
+	"io"
+)
 
 // Differences contains the differences between two tables
 type Differences struct {
 	ExtraRows     int
 	ExtraColumns  int
 	Modifications [][]string
+}
+
+func (diffs *Differences) Write(w io.Writer) error {
+	writer := csv.NewWriter(w)
+	return writer.WriteAll(diffs.Modifications)
 }
 
 // Diff returns the Differences in table2 relative to table1 and whether the two tables are equal.
