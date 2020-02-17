@@ -19,13 +19,13 @@ func Test_diff(t *testing.T) {
 		{"no differences", args{
 			[][]string{{"foo"}, {"bar"}},
 			[][]string{{"foo"}, {"bar"}}},
-			&Differences{0, 0, [][]string{{""}, {""}}},
+			nil,
 			true,
 		},
 		{"no differences - both empty", args{
 			[][]string{},
 			[][]string{}},
-			&Differences{0, 0, [][]string{}},
+			nil,
 			true,
 		},
 		{"1 more row", args{

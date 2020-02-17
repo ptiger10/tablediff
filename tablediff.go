@@ -67,6 +67,9 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 			mods[i][k] = val
 		}
 	}
+	if equal {
+		return nil, true
+	}
 	ret := &Differences{
 		ExtraRows:     extraRows,
 		ExtraColumns:  extraColumns,
