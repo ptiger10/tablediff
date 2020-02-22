@@ -1,9 +1,12 @@
 package tablediff
 
 import (
+	"bytes"
 	"encoding/csv"
 	"fmt"
 	"io"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 // Differences contains the differences between two tables
@@ -11,6 +14,14 @@ type Differences struct {
 	ExtraRows     int
 	ExtraColumns  int
 	Modifications [][]string
+}
+
+func (diffs *Differences) String() string {
+	var buf bytes.Buffer
+	table := tablewriter.NewWriter(&buf)
+	table.AppendBulk(diffs.Modifications)
+	table.Render()
+	return buf.String()
 }
 
 func (diffs *Differences) Write(w io.Writer) error {
