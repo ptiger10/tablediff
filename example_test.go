@@ -5,14 +5,25 @@ import (
 )
 
 func ExampleDifferences() {
-	diffs := &Differences{
-		ExtraRows:     1,
-		ExtraColumns:  0,
-		Modifications: [][]string{{"foo -> bar"}},
+	table1 := [][]string{{"foo", "bar", "qux"}}
+	table2 := [][]string{{"foo", "baz", "qux"}}
+	diffs, ok := Diff(table1, table2)
+	if !ok {
+		fmt.Println(diffs)
 	}
-	fmt.Println(diffs)
 	// Output:
-	// +------------+
-	// | foo -> bar |
-	// +------------+
+	// modified: [0][1] = bar -> baz
+}
+
+func ExampleDifferences_AsTable() {
+	table1 := [][]string{{"foo", "bar", "qux"}}
+	table2 := [][]string{{"foo", "baz", "qux"}}
+	diffs, ok := Diff(table1, table2)
+	if !ok {
+		fmt.Println(diffs.AsTable())
+	}
+	// Output:
+	// +--+------------+--+
+	// |  | bar -> baz |  |
+	// +--+------------+--+
 }

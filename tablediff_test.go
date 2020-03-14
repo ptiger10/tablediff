@@ -31,37 +31,61 @@ func Test_diff(t *testing.T) {
 		{"1 more row", args{
 			[][]string{{"foo"}},
 			[][]string{{"foo"}, {"baz"}}},
-			&Differences{1, 0, [][]string{{""}, {"''->baz"}}},
+			&Differences{
+				ExtraRows:    1,
+				ExtraColumns: 0,
+				TableDiffs:   [][]string{{""}, {"''->baz"}},
+				Diffs:        "added: [1][0] = baz\n"},
 			false,
 		},
 		{"1 fewer row", args{
 			[][]string{{"foo"}, {"baz"}},
 			[][]string{{"foo"}}},
-			&Differences{-1, 0, [][]string{{""}, {"baz->''"}}},
+			&Differences{
+				ExtraRows:    -1,
+				ExtraColumns: 0,
+				TableDiffs:   [][]string{{""}, {"baz->''"}},
+				Diffs:        "removed: [1][0] (previously = baz)\n"},
 			false,
 		},
 		{"1 more column", args{
 			[][]string{{"foo"}},
 			[][]string{{"foo", "bar"}}},
-			&Differences{0, 1, [][]string{{"", "''->bar"}}},
+			&Differences{
+				ExtraRows:    0,
+				ExtraColumns: 1,
+				TableDiffs:   [][]string{{"", "''->bar"}},
+				Diffs:        "added: [0][1] = bar\n"},
 			false,
 		},
 		{"1 fewer column", args{
 			[][]string{{"foo", "bar"}},
 			[][]string{{"foo"}}},
-			&Differences{0, -1, [][]string{{"", "bar->''"}}},
+			&Differences{
+				ExtraRows:    0,
+				ExtraColumns: -1,
+				TableDiffs:   [][]string{{"", "bar->''"}},
+				Diffs:        "removed: [0][1] (previously = bar)\n"},
 			false,
 		},
 		{"different values", args{
 			[][]string{{"foo", "bar"}},
 			[][]string{{"foo", "baz"}}},
-			&Differences{0, 0, [][]string{{"", "bar->baz"}}},
+			&Differences{
+				ExtraRows:    0,
+				ExtraColumns: 0,
+				TableDiffs:   [][]string{{"", "bar -> baz"}},
+				Diffs:        "modified: [0][1] = bar -> baz\n"},
 			false,
 		},
 		{"different shapes", args{
 			[][]string{{"foo", "bar"}},
 			[][]string{{"foo"}, {"baz"}}},
-			&Differences{1, -1, [][]string{{"", "bar->''"}, {"''->baz", "n/a"}}},
+			&Differences{
+				ExtraRows:    1,
+				ExtraColumns: -1,
+				TableDiffs:   [][]string{{"", "bar->''"}, {"''->baz", "n/a"}},
+				Diffs:        "removed: [0][1] (previously = bar)\nadded: [1][0] = baz\n"},
 			false,
 		},
 	}
