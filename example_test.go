@@ -23,7 +23,7 @@ func ExampleDifferences_AsTable() {
 		fmt.Println(diffs.AsTable())
 	}
 	// Output:
-	// +--+------------+--+
-	// |  | bar -> baz |  |
-	// +--+------------+--+
+	// +--+----------+--+
+	// |  | bar->baz |  |
+	// +--+----------+--+
 }

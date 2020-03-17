@@ -1,6 +1,7 @@
 package tablediff
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 )
@@ -74,7 +75,7 @@ func Test_diff(t *testing.T) {
 			&Differences{
 				ExtraRows:    0,
 				ExtraColumns: 0,
-				TableDiffs:   [][]string{{"", "bar -> baz"}},
+				TableDiffs:   [][]string{{"", "bar->baz"}},
 				Diffs:        "modified: [0][1] = bar -> baz\n"},
 			false,
 		},
@@ -97,6 +98,46 @@ func Test_diff(t *testing.T) {
 			}
 			if equal != tt.wantEqual {
 				t.Errorf("Diff() equal = %#v, want %#v", equal, tt.wantEqual)
+			}
+		})
+	}
+}
+
+func TestDifferences_Write(t *testing.T) {
+	type fields struct {
+		ExtraRows    int
+		ExtraColumns int
+		TableDiffs   [][]string
+		Diffs        string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantW   string
+		wantErr bool
+	}{
+		{"pass", fields{
+			TableDiffs: [][]string{{"foo->bar", "bar->''"}, {"''->baz", "n/a"}}},
+			"" +
+				"foo->bar,bar->''\n" +
+				"''->baz,n/a\n", false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			diffs := &Differences{
+				ExtraRows:    tt.fields.ExtraRows,
+				ExtraColumns: tt.fields.ExtraColumns,
+				TableDiffs:   tt.fields.TableDiffs,
+				Diffs:        tt.fields.Diffs,
+			}
+			w := &bytes.Buffer{}
+			if err := diffs.Write(w); (err != nil) != tt.wantErr {
+				t.Errorf("Differences.Write() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotW := w.String(); gotW != tt.wantW {
+				t.Errorf("Differences.Write() = %v, want %v", gotW, tt.wantW)
 			}
 		})
 	}

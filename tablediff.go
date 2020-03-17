@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/ptiger10/tablewriter"
 )
 
 // Differences contains the differences between two tables
@@ -24,8 +24,9 @@ func (diffs *Differences) String() string {
 // AsTable returns TableDiffs as an ASCII table.
 func (diffs *Differences) AsTable() string {
 	var buf bytes.Buffer
-	table := tablewriter.NewWriter(&buf)
-	table.AppendBulk(diffs.TableDiffs)
+	tablewriter.ChangeDefaults(tablewriter.Defaults{MaxColWidth: 50})
+	table := tablewriter.NewTable(&buf)
+	table.AppendRows(diffs.TableDiffs)
 	table.Render()
 	return buf.String()
 }
@@ -84,7 +85,7 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 				diffString += fmt.Sprintf("removed: [%d][%d] (previously = %v)\n", i, k, table1[i][k])
 				// modified from table 1 to table 2
 			} else if table1[i][k] != table2[i][k] {
-				val = fmt.Sprintf("%v -> %v", table1[i][k], table2[i][k])
+				val = fmt.Sprintf("%v->%v", table1[i][k], table2[i][k])
 				equal = false
 				diffString += fmt.Sprintf("modified: [%d][%d] = %v -> %v\n", i, k, table1[i][k], table2[i][k])
 			}
