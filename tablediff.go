@@ -31,7 +31,8 @@ func (diffs *Differences) AsTable() string {
 	return buf.String()
 }
 
-func (diffs *Differences) Write(w io.Writer) error {
+// WriteCSV writes `diffs` to `w` in CSV format.
+func (diffs *Differences) WriteCSV(w io.Writer) error {
 	writer := csv.NewWriter(w)
 	return writer.WriteAll(diffs.TableDiffs)
 }

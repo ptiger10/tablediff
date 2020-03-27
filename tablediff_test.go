@@ -103,7 +103,7 @@ func Test_diff(t *testing.T) {
 	}
 }
 
-func TestDifferences_Write(t *testing.T) {
+func TestDifferences_WriteCSV(t *testing.T) {
 	type fields struct {
 		ExtraRows    int
 		ExtraColumns int
@@ -132,12 +132,12 @@ func TestDifferences_Write(t *testing.T) {
 				Diffs:        tt.fields.Diffs,
 			}
 			w := &bytes.Buffer{}
-			if err := diffs.Write(w); (err != nil) != tt.wantErr {
-				t.Errorf("Differences.Write() error = %v, wantErr %v", err, tt.wantErr)
+			if err := diffs.WriteCSV(w); (err != nil) != tt.wantErr {
+				t.Errorf("Differences.WriteCSV() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotW := w.String(); gotW != tt.wantW {
-				t.Errorf("Differences.Write() = %v, want %v", gotW, tt.wantW)
+				t.Errorf("Differences.WriteCSV() = %v, want %v", gotW, tt.wantW)
 			}
 		})
 	}
