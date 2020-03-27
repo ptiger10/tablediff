@@ -1,2 +1,4 @@
 github.com/ptiger10/tablewriter v0.2.1 h1:r63dXa1ofpCeEEv+7dBMSZ75k/A2jwBF/Xty4LP8usI=
 github.com/ptiger10/tablewriter v0.2.1/go.mod h1:41ATaQp2h910kRg0wjpd/Rvo6J2VlDQDXD2mg0yBeB0=
+github.com/ptiger10/tablewriter v0.3.2 h1:N7qOJFcvlJlJPsQLLAaEV0bx1ygw2rYlvB6cCzCgqNA=
+github.com/ptiger10/tablewriter v0.3.2/go.mod h1:Mf9srZNhUOCo5jAlQAYB5lAJSBPcpo6MYMBJJulIzh8=
