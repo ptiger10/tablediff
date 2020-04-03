@@ -11,10 +11,8 @@ import (
 
 // Differences contains the differences between two tables
 type Differences struct {
-	ExtraRows    int
-	ExtraColumns int
-	TableDiffs   [][]string
-	Diffs        string
+	TableDiffs [][]string
+	Diffs      string
 }
 
 func (diffs *Differences) String() string {
@@ -34,28 +32,27 @@ func (diffs *Differences) AsTable() string {
 // WriteCSV writes `diffs` to `w` in CSV format.
 func (diffs *Differences) WriteCSV(w io.Writer) error {
 	writer := csv.NewWriter(w)
+	writer.Comma = '|'
 	return writer.WriteAll(diffs.TableDiffs)
 }
 
-// Diff returns the Differences in table2 relative to table1 and whether the two tables are equal.
+// Diff returns whether `got` is equal to `want`, and if not, the Differences between the two.
 // The tables are read assuming the major dimension is rows, so [1][3] refers to row 1, column 3 (zero-indexed).
-func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool) {
+func Diff(got [][]string, want [][]string) (diffs *Differences, equal bool) {
 	equal = true
 	// check for nil table
 	var nCols1, nCols2 int
-	if len(table1) != 0 {
-		nCols1 = len(table1[0])
+	if len(got) != 0 {
+		nCols1 = len(got[0])
 	}
-	if len(table2) != 0 {
-		nCols2 = len(table2[0])
+	if len(want) != 0 {
+		nCols2 = len(want[0])
 	}
-	extraRows := len(table2) - len(table1)
-	extraColumns := nCols2 - nCols1
 
 	// determine max rows
-	maxRows := len(table1)
-	if len(table2) > len(table1) {
-		maxRows = len(table2)
+	maxRows := len(got)
+	if len(want) > len(got) {
+		maxRows = len(want)
 	}
 	// determine max columns
 	maxCols := nCols1
@@ -68,27 +65,27 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 		tableDiffs[i] = make([]string, maxCols)
 		for k := 0; k < maxCols; k++ {
 			var val string
-			notInTable1 := len(table1) <= i || nCols1 <= k
-			notInTable2 := len(table2) <= i || nCols2 <= k
+			notInGot := len(got) <= i || nCols1 <= k
+			notInWant := len(want) <= i || nCols2 <= k
 			// not in either table (due to combining different dimensions)
-			if notInTable1 && notInTable2 {
+			if notInGot && notInWant {
 				val = "n/a"
 				equal = false
-				// added relative to table 1
-			} else if notInTable1 {
-				val = fmt.Sprintf("''->%v", table2[i][k])
+				// in want, not in got
+			} else if notInGot {
+				val = fmt.Sprintf("got '', want %v", want[i][k])
 				equal = false
-				diffString += fmt.Sprintf("added: [%d][%d] = %v\n", i, k, table2[i][k])
-				// removed relative to table 1
-			} else if notInTable2 {
-				val = fmt.Sprintf("%v->''", table1[i][k])
+				diffString += fmt.Sprintf("[%d][%d]: %v\n", i, k, val)
+				// in got, not in want
+			} else if notInWant {
+				val = fmt.Sprintf("got %v, want ''", got[i][k])
 				equal = false
-				diffString += fmt.Sprintf("removed: [%d][%d] (previously = %v)\n", i, k, table1[i][k])
-				// modified from table 1 to table 2
-			} else if table1[i][k] != table2[i][k] {
-				val = fmt.Sprintf("%v->%v", table1[i][k], table2[i][k])
+				diffString += fmt.Sprintf("[%d][%d]: %v\n", i, k, val)
+				// different in got compared to want
+			} else if got[i][k] != want[i][k] {
+				val = fmt.Sprintf("got %v, want %v", got[i][k], want[i][k])
 				equal = false
-				diffString += fmt.Sprintf("modified: [%d][%d] = %v -> %v\n", i, k, table1[i][k], table2[i][k])
+				diffString += fmt.Sprintf("[%d][%d]: %v\n", i, k, val)
 			}
 			tableDiffs[i][k] = val
 		}
@@ -97,10 +94,8 @@ func Diff(table1 [][]string, table2 [][]string) (diffs *Differences, equal bool)
 		return nil, true
 	}
 	ret := &Differences{
-		ExtraRows:    extraRows,
-		ExtraColumns: extraColumns,
-		TableDiffs:   tableDiffs,
-		Diffs:        diffString,
+		TableDiffs: tableDiffs,
+		Diffs:      diffString,
 	}
 	return ret, equal
 }

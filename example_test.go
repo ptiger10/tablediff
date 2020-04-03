@@ -12,7 +12,7 @@ func ExampleDifferences() {
 		fmt.Println(diffs)
 	}
 	// Output:
-	// modified: [0][1] = bar -> baz
+	// [0][1]: got bar, want baz
 }
 
 func ExampleDifferences_AsTable() {
@@ -23,7 +23,7 @@ func ExampleDifferences_AsTable() {
 		fmt.Println(diffs.AsTable())
 	}
 	// Output:
-	// +--+----------+--+
-	// |  | bar->baz |  |
-	// +--+----------+--+
+	// +--+-------------------+--+
+	// |  | got bar, want baz |  |
+	// +--+-------------------+--+
 }
